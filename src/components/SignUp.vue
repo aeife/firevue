@@ -1,16 +1,16 @@
 <template>
-    <div class="login">
-        <h3>Log In</h3>
+    <div class="sign-up">
+        <h3>Sign Up</h3>
         <input type="text" placeholder="Email" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
-        <button @click="login">Connection</button>
-        <p>No Account? <router-link to="/sign-up">Create one</router-link></p>
+        <button @click="signUp">Sign Up</button>
+        <p>go back to <router-link to="/login">login</router-link></p>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'login',
+    name: 'signup',
     data () {
         return {
             email: '',
@@ -18,8 +18,8 @@ export default {
         };
     },
     methods: {
-        async login () {
-            await this.$store.dispatch('user/login', {email: this.email, password: this.password});
+        async signUp () {
+            await this.$store.dispatch('user/signUp', {email: this.email, password: this.password});
             this.$router.replace('test');
         }
     }

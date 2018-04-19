@@ -2,16 +2,21 @@
     <div class="hello">
         <h1>test</h1>
         <p>{{msg}}</p>
+        <h2>user: {{this.email}}</h2>
+        <router-link to="/login">Login</router-link>
         <router-link to="/">Test</router-link>
+        <button @click="logout">Logout</button>
         <p>Counter: {{this.count}}</p>
         <input type="number" placeholder="amount" v-model="amount">
         <button @click="apply">Apply</button>
         <h1>posts</h1>
+        <!-- {{posts[0].title}} -->
         <ul>
             <li v-for="(post, index) in posts" :key="index">
                 <h2>{{post.title}}</h2>
                 <small>{{post.id}}</small>
-                <p>{{post.text}}</p>
+                <input type="text" v-model="post.text">
+                <button @click="updatePost(post)">update</button>
                 <button class="button is-small is-danger" @click="deletePost(post.id)">
                     Delete
                 </button>
@@ -29,7 +34,6 @@
 <script>
 import { mapGetters } from 'vuex';
 import { db } from '../main';
-console.log('db', db);
 
 export default {
     name: 'Test',
@@ -47,9 +51,16 @@ export default {
             posts: db.collection('posts')
         };
     },
-    computed: mapGetters({
-        count: 'currentCount'
-    }),
+    computed: {
+        email () {
+            const profile = this.$store.getters['user/profile'];
+            return profile ? profile.email : null;
+        },
+        ...mapGetters({
+            count: 'currentCount',
+            profile: 'user/profile'
+        })
+    },
     methods: {
         apply () {
             console.log(this.posts);
@@ -63,6 +74,13 @@ export default {
         },
         deletePost (id) {
             db.collection('posts').doc(id).delete();
+        },
+        updatePost (post) {
+            db.collection('posts').doc(post.id).set(post);
+        },
+        async logout () {
+            await this.$store.dispatch('user/logout');
+            this.$router.replace('login');
         }
     }
 };
