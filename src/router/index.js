@@ -5,15 +5,13 @@ import Test from '@/components/Test';
 import Login from '@/components/Login';
 import SignUp from '@/components/SignUp';
 import firebase from 'firebase';
+import waitForAuth from './waitForAuth';
 
 Vue.use(Router);
 
 const router = new Router({
     mode: 'history',
     routes: [{
-        path: '*',
-        redirect: '/login'
-    }, {
         path: '/',
         name: 'HelloWorld',
         component: HelloWorld
@@ -21,6 +19,7 @@ const router = new Router({
         path: '/test',
         name: 'Test',
         component: Test,
+        beforeEnter: waitForAuth,
         meta: {
             requiresAuth: true
         }
@@ -42,7 +41,8 @@ router.beforeEach((to, from, next) => {
     if (requiresAuth && !currentUser) {
         next('login');
     } else if (!requiresAuth && currentUser) {
-        next('test');
+        // next('test');
+        next();
     } else {
         next();
     }

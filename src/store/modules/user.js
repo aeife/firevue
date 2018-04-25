@@ -1,12 +1,17 @@
 import firebase from 'firebase';
+import {db} from '../../main';
 
 const state = {
-    profile: null
+    profile: null,
+    data: {}
 };
 
 const getters = {
     profile (state) {
         return state.profile;
+    },
+    data (state) {
+        return state.data;
     },
     loggedIn (state) {
         console.log('state', state.profile);
@@ -45,13 +50,18 @@ const actions = {
             console.log('oops error, ', error);
         }
     },
-    autoSignIn ({commit}, payload) {
+    autoSignIn ({commit, dispatch}, payload) {
         console.log('auto signin');
         console.log(payload);
         commit('setUser', {
             id: payload.uid,
             email: payload.email
         });
+        dispatch('fetchUserData');
+    },
+    async fetchUserData ({commit, state}) {
+        const user = await db.collection('users').doc(state.profile.id).get();
+        commit('setUserData', user.data());
     },
     async logout ({commit}) {
         await firebase.auth().signOut();
@@ -61,6 +71,9 @@ const actions = {
 const mutations = {
     setUser (state, payload) {
         state.profile = payload;
+    },
+    setUserData (state, payload) {
+        state.data = payload;
     }
 };
 
